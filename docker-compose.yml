@@ -1,0 +1,82 @@
+version: '3'  # Docker-Compose version
+
+services:     # services we are going to use
+
+  #PostgreSQL database
+
+  postgres:
+    image: postgres:13  # version
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # volume for postgres_data
+    networks:
+      - airflow-net
+
+  # Redis - Airflow needs it for message queuing
+
+  redis:
+    image: redis:alpine
+    networks:
+      - airflow-net
+
+  # Airflow Webserver
+
+  webserver:
+    image: apache/airflow:2.3.0
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=WC2pBBBzOjfFXHHHU0Q58Y8kZWwu5yX4vUa5Q_lb5nI=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=ansgDx78hUSsMP1JyolpNEE4L5Adi3T6QTZHmJ6KA944
+      - AIRFLOW__WEBSERVER__WEB_SERVER_PORT=8080
+    ports:
+      - "8080:8080"
+    command: >
+      bash -c "pip install -r /requirements.txt && airflow db upgrade && airflow users create --username admin --firstname Aryan --lastname Rana --role Admin --password admin --email aryan@airflow.local && airflow webserver"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - airflow-net
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./extract:/opt/airflow/extract
+      - ./output:/opt/airflow/output
+      - ./requirements.txt:/requirements.txt
+
+  # Airflow Scheduler - Trigger tasks as per DAG schedule
+
+  scheduler:
+    image: apache/airflow:2.3.0
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=WC2pBBBzOjfFXHHHU0Q58Y8kZWwu5yX4vUa5Q_lb5nI=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=ansgDx78hUSsMP1JyolpNEE4L5Adi3T6QTZHmJ6KA944
+    depends_on:
+      - webserver
+      - postgres
+      - redis
+    command: >
+      bash -c "pip install -r /requirements.txt && airflow scheduler"
+
+    networks:
+      - airflow-net
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./extract:/opt/airflow/extract
+      - ./output:/opt/airflow/output
+      - ./requirements.txt:/requirements.txt
+
+
+
+# Define persistent volume for PostgreSQL data      
+volumes:
+  postgres_data:
+
+# Define a custom network for Airflow to use
+networks:
+  airflow-net:
