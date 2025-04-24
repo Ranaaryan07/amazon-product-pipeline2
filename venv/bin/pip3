@@ -1,4 +1,4 @@
-#!/home/aryan/amazon-product-pipeline/venv/bin/python3
+#!/home/aryan/amazon-product-pipeline2/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

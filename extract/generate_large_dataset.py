@@ -1,6 +1,8 @@
 from faker import Faker # python library to generate fake records (Amazon products)
 import random           # built-in python module to pick random values like categories,price,date,etc..
 import pandas as pd     # using pandas to convert fake data into dataset then save it as a JSON file.
+import os               # to check if the output directory exists or not.  
+import stat             # For setting file permissions
 
 fake = Faker()          # creates a faker object to generate fake values.
 categories = ["Electronics", "Clothing", "Books", "Home", "Beauty", "Toys"] #List of sample products to randomly assign.
@@ -26,11 +28,27 @@ def generate_data():
 
     df=pd.DataFrame(data)   # convert the randomly created data's list in pandas dataframe
 
-    df.to_json("/opt/airflow/output/large_raw_data.json", orient="records", lines=True)
+    # File path where the data will be saved
+    file_path = "/opt/airflow/output/large_raw_data.json"
+
+    # Check if the file exists and remove it
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    df.to_json(file_path, orient="records", lines=True)
     # convert the dataframe into json format and save it in the given location
     # orient means saves each row as a separate json object.
     # line means Makes it new-line delimited:- saves as one json object per line.
 
+
+    # Set file permissions to allow read/write for all users
+    # This prevents permission errors when another script or process tries to access this file
+    os.chmod(
+        file_path, 
+        stat.S_IRUSR | stat.S_IWUSR |  # Owner: read & write
+        stat.S_IRGRP | stat.S_IWGRP |  # Group: read & write
+        stat.S_IROTH | stat.S_IWOTH    # Others: read & write
+    )
 
     print(f"successfully created {num_records} at 'large_raw_data.json'")
 

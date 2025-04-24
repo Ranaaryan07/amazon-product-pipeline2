@@ -3,7 +3,6 @@ version: '3'  # Docker-Compose version
 services:     # services we are going to use
 
   #PostgreSQL database
-
   postgres:
     image: postgres:13  # version
     environment:
@@ -16,16 +15,16 @@ services:     # services we are going to use
       - airflow-net
 
   # Redis - Airflow needs it for message queuing
-
   redis:
     image: redis:alpine
     networks:
       - airflow-net
 
   # Airflow Webserver
-
   webserver:
-    image: apache/airflow:2.3.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -45,12 +44,17 @@ services:     # services we are going to use
       - ./dags:/opt/airflow/dags
       - ./extract:/opt/airflow/extract
       - ./output:/opt/airflow/output
+      - ./transformed:/opt/airflow/transformed
+      - ./spark_jobs:/opt/airflow/spark_jobs
       - ./requirements.txt:/requirements.txt
+    dns:
+      - 8.8.8.8 # Adding DNS to resolve DNS issues    
 
   # Airflow Scheduler - Trigger tasks as per DAG schedule
-
   scheduler:
-    image: apache/airflow:2.3.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -69,9 +73,11 @@ services:     # services we are going to use
       - ./dags:/opt/airflow/dags
       - ./extract:/opt/airflow/extract
       - ./output:/opt/airflow/output
+      - ./transformed:/opt/airflow/transformed
+      - ./spark_jobs:/opt/airflow/spark_jobs
       - ./requirements.txt:/requirements.txt
-
-
+    dns:
+      - 8.8.8.8
 
 # Define persistent volume for PostgreSQL data      
 volumes:
