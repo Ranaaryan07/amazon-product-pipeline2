@@ -31,7 +31,11 @@ def transform_data():
     df_transformed = df_transformed.withColumn("timestamp", col("timestamp").cast(TimestampType()))
 
     # Writing the data 
-    df_transformed.write.mode("overwrite").parquet("/opt/airflow/transformed/transformed_data.parquet")
-    
+    (df_transformed
+        .coalesce(1) \
+        .write \
+        .mode("overwrite") \
+        .parquet("/opt/airflow/transformed/otpt.parquet")
+    )
     # Stop the Spark session
     spark.stop()
