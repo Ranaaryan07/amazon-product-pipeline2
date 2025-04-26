@@ -1,0 +1,10 @@
+In this dags folder we have three .py files all have different properties:-
+
+Uncomment and move to dags folder which one you want to use.
+
+1. "create-transform-amazon-data.py" :- If we want our code to generate the data and place the generated data in a separate folder then 
+                                        transform the same data by picking up from that location and transform it and then save it in a separate folder
+                                        using only Single DAG.
+
+2. "amazon-prduct-pipeline-dag.py" & "transform-dag.py" :- If we want our code of generation of data in a separate DAG and our code of transforming the data in a
+                                                            separate DAG and trigger the second DAG from the first DAG using TriggerDagRunOperator.

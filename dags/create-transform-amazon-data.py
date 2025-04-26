@@ -1,3 +1,5 @@
+### This script is an Airflow DAG that generates fake Amazon product data and then transforms it using Spark in the same DAG.
+
 # from airflow import DAG
 # from airflow.operators.python import PythonOperator
 # from datetime import datetime, timedelta

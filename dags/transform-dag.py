@@ -22,7 +22,7 @@ with DAG(
     dag_id='transform-amazon-product-data',
     default_args=default_args,
     description='Transform Amazon product data using Spark',
-    start_date=datetime(2025, 4, 25),
+    start_date=datetime(2025, 4, 26),
     schedule_interval='@daily',
     catchup=False
 ) as dag:

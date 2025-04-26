@@ -19,7 +19,7 @@ with DAG(
     dag_id='amazon-product-pipeline',
     default_args=default_args,
     description='Create fake Amazon product data and save as JSON',
-    start_date=datetime(2025, 4, 25),
+    start_date=datetime(2025, 4, 26),
     schedule_interval='@daily',
     catchup=False
 ) as dag:
