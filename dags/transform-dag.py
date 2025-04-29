@@ -1,6 +1,7 @@
 from airflow import DAG
-from airflow.sensors.external_task import ExternalTaskSensor
+# from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.operators.python import PythonOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from datetime import datetime, timedelta
 
 import sys
@@ -43,4 +44,9 @@ with DAG(
         python_callable=transform_data # this will call the transform function from the transform_products.py file
     )
 
-    transform_task # task dependencies, which one runs first.
+    trigger_load_dag =TriggerDagRunOperator(
+        task_id='trigger_load_dag',
+        trigger_dag_id='gcs_to_bigquery',
+    )
+
+    transform_task >> trigger_load_dag # task dependencies, which one runs first.

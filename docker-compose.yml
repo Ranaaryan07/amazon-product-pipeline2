@@ -47,8 +47,9 @@ services:     # services we are going to use
       - ./transformed:/opt/airflow/transformed
       - ./spark_jobs:/opt/airflow/spark_jobs
       - ./requirements.txt:/requirements.txt
+      - /home/aryan/keys/crucial-axon-458017-j5-7778696566d9.json:/opt/airflow/keys/crucial-axon-458017-j5-7778696566d9.json
     dns:
-      - 8.8.8.8 # Adding DNS to resolve DNS issues    
+      - 8.8.8.8 # Adding DNS to resolve DNS issues  
 
   # Airflow Scheduler - Trigger tasks as per DAG schedule
   scheduler:
@@ -76,6 +77,7 @@ services:     # services we are going to use
       - ./transformed:/opt/airflow/transformed
       - ./spark_jobs:/opt/airflow/spark_jobs
       - ./requirements.txt:/requirements.txt
+      - /home/aryan/keys/crucial-axon-458017-j5-7778696566d9.json:/opt/airflow/keys/crucial-axon-458017-j5-7778696566d9.json
     dns:
       - 8.8.8.8
 
